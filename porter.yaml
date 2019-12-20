@@ -6,7 +6,7 @@
 name: brigade
 version: 0.1.0
 description: "A CNAB bundle that tests for the nfs storage class and installs Brigade to use it by default."
-invocationImage: squillace/brigadeinstall:v0.1.0
+invocationImage: squillace/brigade-install:v0.1.0
 tag: squillace/brigade:v0.1.0
 
 # Uncomment out the line below to use a template Dockerfile for your invocation image
