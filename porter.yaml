@@ -3,11 +3,11 @@
 # See https://porter.sh/author-bundles for documentation on how to configure your bundle
 # Uncomment out the sections below to take full advantage of what Porter can do!
 
-name: brigade-buck
+name: brigade
 version: 0.1.0
-description: "A CNAB bundle that tests for the nfs storage class, installs Brigade to use it by default, and then installs Buck."
-invocationImage: squillace/brigade-buck-install:v0.1.0
-tag: squillace/brigade-buck:v0.1.0
+description: "A CNAB bundle that tests for the nfs storage class and installs Brigade to use it by default."
+invocationImage: squillace/brigadeinstall:v0.1.0
+tag: squillace/brigade:v0.1.0
 
 # Uncomment out the line below to use a template Dockerfile for your invocation image
 #dockerfile: Dockerfile.tmpl
@@ -20,7 +20,7 @@ parameters:
   - name: READWRITEMANY_STORAGECLASS
     description: "The name of the storage class to use for Brigade, which requires ReadWriteMany."
     type: string
-    default: "azurefiles"
+    default: "nfs"
 
 mixins:
   - exec
@@ -32,40 +32,32 @@ install:
       description: "Check for storage classes..."
       command: bash
       flags:
-        c: ./checkForReadWriteMany.sh 
-      outputs:
-      - name: "resultCode"
-        regex: ".*"
+        c: ./checkForReadWriteMany.sh "{{bundle.parameters.READWRITEMANY_STORAGECLASS}}"
 
-  - exec:
-      command: bash
-      description: "Confirming storage classes..."
-      flags:
-        c: if [ "{{bundle.outputs.resultCode}}" = 1 ]; then exit; fi
   - helm3:
-      description: "adding the repo"
+      description: "Storage class found; adding the Brigade repo."
       arguments:
        - repo
        - add
        - brigade
        - https://brigadecore.github.io/charts
   - helm3:
-      description: "Updating the stable repository."
+      description: "Updating the brigade chart."
       arguments:
         - repo
         - update
-#  - helm3:
-#      description: "Installing Brigade using Helm 3."
-#      arguments:
-#        - install 
-#        - brigade 
-#        - brigade/brigade 
-#        - --set 
-#        - worker.defaultBuildStorageClass=nfs
-#        - --set 
-#        - worker.defaultCacheStorageClass=nfs
-#        - --set
-#        - vacuum.age= "8h"
+  - helm3:
+      description: "Installing Brigade using Helm 3."
+      arguments:
+        - install 
+        - brigade 
+        - brigade/brigade 
+        - --set 
+        - worker.defaultBuildStorageClass=nfs
+        - --set 
+        - worker.defaultCacheStorageClass=nfs
+        - --set
+        - vacuum.age= "8h"
 
 upgrade:
   - exec:
@@ -75,6 +67,11 @@ upgrade:
         c: echo World 2.0
 
 uninstall:
+  - helm3:
+      description: "Uninstalling Brigade using Helm 3."
+      arguments:
+        - delete
+        - brigade
   - exec:
       description: "Uninstall Hello World"
       command: bash
