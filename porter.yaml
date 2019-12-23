@@ -4,10 +4,10 @@
 # Uncomment out the sections below to take full advantage of what Porter can do!
 
 name: brigade
-version: 0.1.0
+version: 0.1.1
 description: "A CNAB bundle that tests for the nfs storage class and installs Brigade to use it by default."
-invocationImage: squillace/brigade-install:v0.1.0
-tag: squillace/brigade:v0.1.0
+invocationImage: squillace/brigade-install:v0.1.1
+tag: squillace/brigade:v0.1.1
 
 # Uncomment out the line below to use a template Dockerfile for your invocation image
 #dockerfile: Dockerfile.tmpl
@@ -56,6 +56,8 @@ install:
         - worker.defaultBuildStorageClass=nfs
         - --set 
         - worker.defaultCacheStorageClass=nfs
+        - --set
+        - vacuum.age=8h
 
 upgrade:
   - exec:
