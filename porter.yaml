@@ -56,8 +56,6 @@ install:
         - worker.defaultBuildStorageClass=nfs
         - --set 
         - worker.defaultCacheStorageClass=nfs
-        - --set
-        - vacuum.age= "8h"
 
 upgrade:
   - exec:
